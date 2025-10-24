@@ -31,11 +31,14 @@ class FFNN(nn.Module):
         return self.loss(predicted_vector, gold_label)
 
     def forward(self, input_vector):
-        # [to fill] obtain first hidden layer representation
+        # Hidden Layer Representation
+        hidden_output = self.activation(self.W1(input_vector))
 
-        # [to fill] obtain output layer representation
+        # Output Layer Representation
+        final_output = self.W2(hidden_output)
 
         # [to fill] obtain probability dist.
+        predicted_vector = self.softmax(final_output)
 
         return predicted_vector
 
@@ -149,7 +152,7 @@ if __name__ == "__main__":
                     loss = example_loss
                 else:
                     loss += example_loss
-            loss = loss / minibatch_size
+            loss = loss / minibatch_size # type: ignore
             loss.backward()
             optimizer.step()
         print("Training completed for epoch {}".format(epoch + 1))
@@ -178,7 +181,7 @@ if __name__ == "__main__":
                     loss = example_loss
                 else:
                     loss += example_loss
-            loss = loss / minibatch_size
+            loss = loss / minibatch_size # type: ignore
         print("Validation completed for epoch {}".format(epoch + 1))
         print("Validation accuracy for epoch {}: {}".format(epoch + 1, correct / total))
         print("Validation time for this epoch: {}".format(time.time() - start_time))
