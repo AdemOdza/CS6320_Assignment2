@@ -50,7 +50,9 @@ def make_vocab(data):
         for word in document:
             vocab.add(word)
     return vocab
-                                                                                                                                                                                                                                        # Returns:
+
+
+# Returns:
 # vocab = A set of strings corresponding to the vocabulary including <UNK>
 # word2index = A dictionary mapping word/token to its index (a number in 0, ..., V - 1)
 # index2word = A dictionary inverting the mapping of word2index
@@ -81,7 +83,8 @@ def convert_to_vector_representation(data, word2index):
 
 ### START OF MODIFIED CODE ###
 # We modified the load_data function to also load the test data
-def load_data(train_data, val_data, test_data):                                                                         with open(train_data) as training_f:
+def load_data(train_data, val_data, test_data):
+    with open(train_data) as training_f:
         training = json.load(training_f)
     with open(val_data) as valid_f:
         validation = json.load(valid_f)
@@ -108,6 +111,7 @@ if __name__ == "__main__":
     parser.add_argument("--val_data", required = True, help = "path to validation data")
     ### START OF MODIFIED CODE ###
     parser.add_argument("--test_data", default = "test.json", help = "path to test data")
+    parser.add_argument("--learning_rate", type=float, default=0.01, help="learning rate") # Added learning rate as a script argument for ease
     ### END OF MODIFIED CODE ###
     parser.add_argument('--do_train', action='store_true')
     args = parser.parse_args()
@@ -134,7 +138,9 @@ if __name__ == "__main__":
 
 
     model = FFNN(input_dim = len(vocab), h = args.hidden_dim)
-    optimizer = optim.SGD(model.parameters(),lr=0.01, momentum=0.9)
+    ### START OF MODIFIED CODE ###
+    optimizer = optim.SGD(model.parameters(),lr=args.learning_rate, momentum=0.9)
+    ### END OF MODIFIED CODE ###
 
     ### START OF MODIFIED CODE ###
     # We use these two lists to compute and store the training losses and validation accuracies for each epoch
