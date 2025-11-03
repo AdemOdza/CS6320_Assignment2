@@ -111,7 +111,6 @@ if __name__ == "__main__":
     parser.add_argument("--val_data", required = True, help = "path to validation data")
     ### START OF MODIFIED CODE ###
     parser.add_argument("--test_data", default = "test.json", help = "path to test data")
-    parser.add_argument("--learning_rate", type=float, default=0.01, help="learning rate") # Added learning rate as a script argument for ease
     ### END OF MODIFIED CODE ###
     parser.add_argument('--do_train', action='store_true')
     args = parser.parse_args()
@@ -139,7 +138,7 @@ if __name__ == "__main__":
 
     model = FFNN(input_dim = len(vocab), h = args.hidden_dim)
     ### START OF MODIFIED CODE ###
-    optimizer = optim.SGD(model.parameters(),lr=args.learning_rate, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(),lr=0.01, momentum=0.9)
     ### END OF MODIFIED CODE ###
 
     ### START OF MODIFIED CODE ###
