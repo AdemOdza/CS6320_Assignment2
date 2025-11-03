@@ -135,12 +135,9 @@ if __name__ == "__main__":
     test_data = convert_to_vector_representation(test_data, word2index)
     ### END OF MODIFIED CODE ###
 
-
     model = FFNN(input_dim = len(vocab), h = args.hidden_dim)
-    ### START OF MODIFIED CODE ###
     optimizer = optim.SGD(model.parameters(),lr=0.01, momentum=0.9)
-    ### END OF MODIFIED CODE ###
-
+    
     ### START OF MODIFIED CODE ###
     # We use these two lists to compute and store the training losses and validation accuracies for each epoch
     train_losses = []
