@@ -10,6 +10,7 @@ import time
 from tqdm import tqdm
 import json
 from argparse import ArgumentParser
+import matplotlib.pyplot as plt
 
 
 unk = '<UNK>'
@@ -140,6 +141,7 @@ if __name__ == "__main__":
     
     ### START OF MODIFIED CODE ###
     # We use these two lists to compute and store the training losses and validation accuracies for each epoch
+    # We then use this data to plot our learning curve.
     train_losses = []
     val_accuracies = []
     ### END OF MODIFIED CODE ###
@@ -248,4 +250,19 @@ if __name__ == "__main__":
 
     test_accuracy = correct / total
     print("Test accuracy: {}".format(test_accuracy))
+    ### END OF MODIFIED CODE ###
+
+    ### START OF MODIFIED CODE ###
+    # Plot learning curve
+    print("========== Plotting learning curve ==========")
+    plt.figure(figsize=(8, 5))
+    plt.plot(range(1, len(train_losses)+1), train_losses, label='Training Loss', color='blue')
+    plt.plot(range(1, len(val_accuracies)+1), val_accuracies, label='Validation Accuracy', color='orange')
+    plt.xlabel('Epoch')
+    plt.ylabel('Value')
+    plt.title('Learning Curve: Training Loss vs Validation Accuracy')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('learning_curve.png')
+    print("Learning curve saved to learning_curve.png")
     ### END OF MODIFIED CODE ###
