@@ -138,7 +138,15 @@
   The optimizer used is \textbf{Stochastic Gradient Descent} which performs mini-batch gradient descent. We also noticed that the current implementation does not have any stopping mechanism such as \textbf{early stopping} where we stop the training once the validation accuracy starts to drop.
 
   \subsection{RNN}
-  \subsubsection{RNN forward() implementation} 
+  \subsubsection{RNN forward() implementation}
+  \begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.9\textwidth]{image (4).png}
+  \caption{RNN Forward Pass Implementation}
+  \label{fig:rnn_forward}
+  \end{figure}
+  %\FloatBarrier
+  
   \begin{itemize}
     \item \textbf{Inputs:} Each example is converted into a sequence of word embeddings shaped $[T, 1, 50]$, where $T$ is the number of tokens, batch size $= 1$, and embedding dimension $= 50$.
     \item \textbf{Obtain hidden layer representation:} A 1-layer tanh RNN maps each timestep to a hidden state, returning outputs with shape $[T, 1, h]$.
@@ -258,8 +266,6 @@
   \hline
   \textbf{Model} & \textbf{Hidden Dim} & \textbf{Epochs} & \textbf{Val Acc} & \textbf{Test Acc} \\
   \hline
-  FFNN & 32 & 10 & 58.6\% & 59.4\% \\
-  FFNN & 64 & 10 & 60.1\% & 46.1\% \\
   RNN  & 32 & 10 &  46.5\% &  43.5\% \\
   RNN  & 64 & 10 & 46.875\% & 48.50\% \\
   RNN  & 128 & 10 & 42.625\% &  46.88\% \\
