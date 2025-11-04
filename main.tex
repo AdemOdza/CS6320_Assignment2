@@ -1,0 +1,331 @@
+% \documentclass[singlecolumn]{article}
+  \documentclass[a4paper]{article}
+
+  \usepackage{color}
+  \usepackage[top=1in,bottom=1in,left=1.2in,right=1.2in]{geometry}
+  \usepackage[small]{titlesec}
+
+  % For clickable links and references
+  \usepackage{hyperref}
+  \hypersetup{
+      colorlinks=true,
+      linkcolor=blue,
+      filecolor=magenta,
+      urlcolor=cyan,
+      citecolor=blue,
+  }
+
+  % For superscript citations
+  \usepackage[superscript]{cite}
+
+  % For code blocks
+  \usepackage{graphicx}
+  \usepackage[]{minted}
+  \newenvironment{code}{\captionsetup{type=listing}}{}
+
+  % For paragraph spacing instead of indentation
+  \usepackage{parskip}
+
+  % For float barriers
+  \usepackage{placeins}
+
+  % Custom heading sizes
+  \titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+  \titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+  \titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+
+  \newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO:} #1}}
+
+  \title{CS6320 Assignment 2 \\ \begin{small}\url{https://github.com/AdemOdza/CS6320_Assignment2}\end{small}}
+  \author{Group 10 \and Abhirup Mukherjee \\ AXM240026 \and Adem Odza \\ AXO180008  \and Buvana Seshathri \\ BXS240020 \and Samiha Kuncham \\SXK240025}
+
+  \date{}
+
+  \begin{document}
+  \maketitle
+
+  \section{Introduction and Data}
+  In this assignment, we complete and evaluate two neural network model implementations for 5-class sentiment analysis using Yelp restaurant reviews. Given the review data, the task is to predict the star rating (between 1 and 5 stars). The models we experiment with are: a Feedforward Neural Network (FFNN) using BOW representation, and a Recurrent Neural Network (RNN) using word embeddings.
+
+  \subsection{Task Description}
+  The task is a multi-class classification problem wherein the model learns to map features from the text to discrete ratings. Given a resturant review, it must correctly predict the corresponding star rating where 1 star is very negative and 5 stars is very positive.
+
+  \subsection{Dataset Overview}
+  The dataset provided by this assignment was pre-split into training, validation, and testing sets. Below are some statistics about the dataset:
+
+  \begin{table}[ht]
+  \centering
+  \begin{tabular}{|l|c|c|c|c|}
+  \hline
+  \textbf{Dataset} & \textbf{Examples} & \textbf{Avg Length} & \textbf{Min Length} & \textbf{Max Length} \\
+  \hline
+  Training   & 16,000 & 124.7 words & 1 word   & 989 words \\
+  Validation &    800 & 140.4 words & 5 words  & 980 words \\
+  Test       &    800 & 109.8 words & 9 words  & 782 words \\
+  \hline
+  \end{tabular}
+  \caption{Dataset Statistics}
+  \label{tab:data_stats}
+  \end{table}
+
+  \subsection{Main Experimental Results}
+  For the FFNN model, we performed our experiments by varying the following hyperparameters: number of hidden dimensions (16, 32, 64, 128) and number of epochs (5, 7, 10, 15). We also tried varying the learning rate to see how it had an effect on overfitting. Out of all the experiments, our FFNN implementation achieved a highest test accuracy of \textbf{59.38\%} using these hyperparameter values: \texttt{hidden\_dim=32}, \texttt{epochs=10} (with default \texttt{lr=0.01}).
+
+  \section{Implementations}
+
+  \subsection{FFNN}
+  \subsubsection{Forward Pass Implementation}
+  The primary task of the FFNN section was to complete the \texttt{forward()} function in \texttt{ffnn.py}. This is the feedforward computation through the layers of the network. Figure~\ref{fig:ffnn_forward} shows our implementation.
+
+  \begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.9\textwidth]{forward.png}
+  \caption{FFNN Forward Pass Implementation}
+  \label{fig:ffnn_forward}
+  \end{figure}
+
+  We used three lines of code to compute the forward pass:
+  \begin{enumerate}
+      \item \textbf{Hidden Layer Computation}: To compute the hidden later we first do a linear transformation \texttt{W1} followed by \texttt{ReLU} activation.
+      
+      \item \textbf{Output Layer Computation}: Next, we apply another linear transformation \texttt{W2} that maps the the hidden dimensions to the 5 rating output classes.
+
+      \item \textbf{Probability Distribution}: Finally, we apply softmax to get our log probabilities which are a probability distribution over the 5 ratings.
+  \end{enumerate}
+
+  \subsubsection{Additional Modifications}
+  \paragraph{1. Test Data Loading}
+  % \begin{figure}[ht]
+  % \centering
+  % \includegraphics[width=0.9\textwidth]{Screenshot 2025-11-03 at 6.17.08 PM.png}
+  % \caption{load\_data() function}
+  % \label{fig:load_data}
+  % \end{figure}
+  % \FloatBarrier 
+  Apart from completing the \texttt{forward()} function in \texttt{ffnn.py}, we also modified the \texttt{load\_data()} function to take the test data as another argument.
+
+  % \begin{figure}[ht]
+  % \centering
+  % \includegraphics[width=0.8\textwidth]{Screenshot 2025-11-03 at 6.17.38 PM.png}
+  % \caption{storing training loss for each epoch}
+  % \label{fig:train_loss}
+  % \end{figure}
+  % \FloatBarrier
+
+  % \begin{figure}[ht]
+  % \centering
+  % \includegraphics[width=0.7\textwidth]{Screenshot 2025-11-03 at 6.17.47 PM.png}
+  % \caption{storing validation accuracy for each epoch}
+  % \label{fig:val_acc}
+  % \end{figure}
+  % \FloatBarrier
+  
+  \paragraph{2. Learning Curve Tracking}
+  To plot the learning curve in Section 3, we also added used two lists to track and accumulate the training losses and validation accuracies for each epoch.
+
+  % \begin{figure}[ht]
+  % \centering
+  % \includegraphics[width=0.9\textwidth]{Screenshot 2025-11-03 at 6.18.02 PM.png}
+  % \caption{test data evaluation function}
+  % \label{fig:test_eval}
+  % \end{figure}
+  % \FloatBarrier
+  
+  \paragraph{3. Test Evaluation}
+  To run the inference on the test data, we wrote a loop similar to the validation one that iterates through the test data and calculates the model's accuracy. We also set the model to evaluation mode using \texttt{model.eval()} which switches the model to eval mode by disabling dropout layers, etc.
+
+  \subsubsection{Understanding Other Components}
+  The optimizer used is \textbf{Stochastic Gradient Descent} which performs mini-batch gradient descent. We also noticed that the current implementation does not have any stopping mechanism such as \textbf{early stopping} where we stop the training once the validation accuracy starts to drop.
+
+  \subsection{RNN}
+  \subsubsection{RNN forward() implementation} 
+  \begin{itemize}
+    \item \textbf{Inputs:} Each example is converted into a sequence of word embeddings shaped $[T, 1, 50]$, where $T$ is the number of tokens, batch size $= 1$, and embedding dimension $= 50$.
+    \item \textbf{Obtain hidden layer representation:} A 1-layer tanh RNN maps each timestep to a hidden state, returning outputs with shape $[T, 1, h]$.
+    \item \textbf{Obtain output layer representations:} A linear layer $\mathbf{W}$ projects each timestep’s hidden state to class logits, resulting in an output of shape $[T, 1, 5]$.
+    \item \textbf{Sum over output:} Per-timestep logits are aggregated by summing along the time dimension ($\text{dim}=0$) to produce a single vector of shape $[1, 5]$ for the entire sequence:
+    \[
+        \mathbf{z}_{\text{agg}} = \sum_{t=1}^{T} \mathbf{z}_t
+    \]
+    \item \textbf{Obtain probability dist:} The aggregated vector is passed through a softmax layer to produce a probability distribution over the output classes:
+    \[
+        \mathbf{p} = \text{softmax}(\mathbf{z}_{\text{agg}})
+    \]
+    Each value in $\mathbf{p}$ represents the model’s predicted probability for a class.
+    \end{itemize}
+
+    \subsubsection{Changes in rnn.py}
+    We have made some modifications in the code to increase accuracy. 
+    \begin{itemize}
+    \item Test data is loaded together with the training and validation data, and additional code is included to compute test accuracy.
+    \item Code has been added to plot the training loss and validation accuracy across epochs for better visualization of learning progress.
+    \item The learning rate was adjusted to 0.001 (from 0.01) to improve model performance and achieve more stable accuracy.
+
+    \end{itemize}
+
+    \subsubsection{Rest of rnn.py}
+    \begin{itemize}
+    \item \textbf{Data Loading:} Reads JSON files into (\texttt{tokens}, \texttt{label}) pairs and reprocesses text by removing punctuation for consistency.
+    
+    \item \textbf{Vectorization:} Converts words to embeddings from \texttt{word\_embedding.pkl}, forming tensors of shape \([T, 1, 50]\) for RNN input.
+    
+    \item \textbf{Model \& Optimization:} The RNN sums output vectors across timesteps, applies a linear layer, then LogSoftmax for class probabilities; trained using NLLLoss and Adam optimizer.
+    
+    \item \textbf{Training \& Validation:} Trains over minibatches, tracks accuracy, and performs early stopping if validation accuracy decreases.
+    
+    \item \textbf{Testing:} Evaluates on the test set using \texttt{argmax} predictions to compute the final accuracy.
+\end{itemize}
+
+  \subsubsection{RNN vs FFNN}
+
+  \begin{itemize}
+    \item \textbf{Sequential Processing:} RNN code processes input words one at a time in sequence. FFNN code processes the entire input as a single fixed-length vector without considering order.
+    
+    \item \textbf{Hidden State:} RNN maintains a hidden state (\texttt{hidden}) that carries information from previous timesteps. FFNN has no memory, each input is processed independently.
+    
+    \item \textbf{RNN Layer vs Linear Layer:} RNN uses \texttt{nn.RNN(input\_dim, h, num\_layers)} to handle sequential data. FFNN uses \texttt{nn.Linear(input\_dim, h)} for a single transformation step.
+    
+    \item \textbf{Dependencies:} RNN captures context and dependencies between words across time. FFNN cannot capture sequence relationships or order information.
+    
+    \item \textbf{Input Representation:} RNN takes word embeddings (e.g., pretrained vectors) as sequential inputs. FFNN uses bag-of-words or frequency-based vector representations.
+    
+    \item \textbf{Computation Flow:} RNN’s forward pass depends on previous outputs (recurrent connection). FFNN’s forward pass depends only on the current input (no recurrence).
+\end{itemize}
+
+ 
+  \FloatBarrier
+
+  \section{Experiments and Results}
+
+  \subsection{Evaluations}
+
+  \subsubsection{FFNN}
+
+  We evaluated our FFNN model using \textbf{classification accuracy} as the main metric. Accuracy is calculated using the formula:
+
+  $$\text{Accuracy} = \frac{\text{Number of Correct Predictions}}{\text{Total Number of Examples}} \times 100\%$$
+
+  For each review in the test set, the model gives a probability distribution and we select the class with the highest probability using \texttt{torch.argmax(predicted\_vector)} and compare it to the gold label. We also track the \textbf{training loss} (negative log likelihood) for all epochs. This helps us track whether or not the model converges.
+
+  \FloatBarrier
+
+  \subsubsection{RNN}
+  We evaluated our RNN model using classification accuracy as the main metric. The training objective was to minimize the Negative Log-Likelihood Loss (NLLLoss).
+
+  \begin{itemize}
+    \item \textbf{Training (per epoch):} While accumulating minibatch loss, it also counts correct predictions to compute training accuracy for that epoch.
+    
+    \item \textbf{Validation (per epoch):} After each epoch, the model is run on the validation set to compute accuracy (\texttt{correct/total}). A simple early-stopping heuristic halts training if validation accuracy drops while training accuracy rises, acting as an overfitting guard.
+    
+    \item \textbf{Test (after training):} Evaluates once on the test set and reports final test accuracy. The training loop computes training accuracy, the validation loop computes validation accuracy, and the final block computes test accuracy and prints:
+    \[
+    \texttt{Test accuracy: 0.4850}
+    \]
+    \end{itemize}
+
+  \subsection{Results}
+
+  \subsubsection{FFNN}
+
+  We conducted 7 experiments by varying \texttt{hidden\_dim}, \texttt{epochs}, and \texttt{lr}. Table~\ref{tab:ffnn_results} shows our results.
+
+  \begin{table}[H]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|c|}
+  \hline
+  \textbf{Exp.} & \textbf{Hidden} & \textbf{Epochs} & \textbf{LR} & \textbf{Final Train} & \textbf{Best Val} & \textbf{Final Val} & \textbf{Test} \\
+  \textbf{No.} & \textbf{Dim} & & & \textbf{Acc} & \textbf{Acc} & \textbf{Acc} & \textbf{Acc} \\
+  \hline
+  1 & 16 & 7 & 0.01 & 62.29\% & 58.00\% & 51.13\% & 56.50\% \\
+  2 & 32 & 5 & 0.01 & 60.29\% & 55.88\% & 55.75\% & 47.63\% \\
+  3 & 32 & 7 & 0.01 & 64.49\% & 58.63\% & 56.88\% & 48.00\% \\
+  4* & 32 & 10 & 0.01 & 71.01\% & 58.63\% & 48.63\% & \textbf{59.38\%} \\
+  5 & 64 & 7 & 0.01 & 64.86\% & \textbf{60.13\%} & 57.50\% & 46.13\% \\
+  6 & 32 & 10 & 0.005 & 74.16\% & 58.25\% & 54.75\% & 56.25\% \\
+  7 & 32 & 15 & 0.001 & 76.13\% & 58.25\% & 56.25\% & 53.88\% \\
+  \hline
+  \end{tabular}
+  \caption{FFNN Experimental Results *Best test accuracy}
+  \label{tab:ffnn_results}
+  \end{table}
+
+  \subsubsection{RNN}
+  We have tried different hidden\_dim values and below are the results produced by those multiple variations.  
+
+  \begin{table}[ht]
+  \centering
+  \begin{tabular}{|l|c|c|c|c|}
+  \hline
+  \textbf{Model} & \textbf{Hidden Dim} & \textbf{Epochs} & \textbf{Val Acc} & \textbf{Test Acc} \\
+  \hline
+  FFNN & 32 & 10 & 58.6\% & 59.4\% \\
+  FFNN & 64 & 10 & 60.1\% & 46.1\% \\
+  RNN  & 32 & 10 &  46.5\% &  43.5\% \\
+  RNN  & 64 & 10 & 46.875\% & 48.50\% \\
+  RNN  & 128 & 10 & 42.625\% &  46.88\% \\
+  \hline
+  \end{tabular}
+  \caption{RNN Experimental Results}
+  \label{tab:results}
+  \end{table}
+ 
+  \FloatBarrier
+
+  \subsubsection{Best Performing Model}
+
+  Our best model (FFNN Experiment 4) achieved a test accuracy of \textbf{59.38\%}, training accuracy of \textbf{71.01\%}, and best validation accuracy of \textbf{58.63\% (at epoch 6)} with the following configuration: \texttt{hidden\_dim=32}, \texttt{epochs=10}, \texttt{lr=0.01}. In spite of showing signs of overfitting, this model gave us the highest test accuracy which implies that moderate overfitting does not have a considerable impact on the model's ability to generalize on unseen data.
+
+  \subsubsection{Hyperparameter Effects and Key Observations}
+
+  The model with hidden dimension of \textbf{32} had the ideal tradeoff between model size and generalization, and while the larger model (dim=64) had the highest validation accuracy (60.13\%), it did not perform well on the test data (46.13\%) since it was clearly overfitting. Training the model for 10 epochs resulted in underfitting, and a larger number of epochs (15) resulted in diminishing returns. A learning rate of \textbf{0.01} performed the best as lower learning rates (0.005, 0.001) resulted in more overfitting since the model took longer to converge. We also noticed a clear pattern in each experiment that the validation accuracy peaked relatively early (around epochs 3-6) and then decreased. This leads us to believe that early stopping could have been used to prevent overfitting.
+
+  \section{Analysis}
+  \subsection{Learning Curves}
+  We have plotted the learning curve with training loss and validation accuracy for both FFNN and RNN.
+
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.75\textwidth]{learning_curve.png}
+      \caption{Learning curves - FFNN}
+      \label{fig:learning_curve}
+  \end{figure}
+
+  \begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Figure_4.png}
+  \caption{Learning curves - RNN}
+  \label{fig:learning_curves}
+  \end{figure}
+
+  \subsection{Error Analysis}
+
+  \subsubsection{FFNN}
+  We noticed a class imbalance between validation and test sets which would mean the validation accuracy does not accurately predict test performance. The model also overfitting as training progresses. To improve performance, we could implement: (1) early stopping based on validation loss, (2) dropout or L2 regularization to reduce overfitting
+
+  \subsubsection{RNN}
+  We noticed the following:
+  \begin{itemize}
+      \item Adjacent star ratings (e.g., 3 vs 4) are commonly confused in sentiment tasks.
+      \item Reviews with mixed sentiment (e.g., 'good food but slow service') tend to be misclassified.
+      \item Very short reviews and those heavy on sarcasm or ambiguity are harder to classify.
+  \end{itemize}
+
+  Thus, some possible improvements could be:
+  \begin{itemize}
+      \item Use a bidirectional RNN or LSTM/GRU to better capture long-term dependencies.
+      \item Apply pretrained embeddings (e.g., GloVe, FastText) for richer word semantics.
+    \item Introduce dropout regularization to reduce overfitting.
+    \item Increase the size or diversity of the training dataset.
+  \end{itemize}
+
+  \section{Conclusion and Others}
+
+  \subsection{Individual Member Contribution}
+  Abhirup and Adem worked on the FFNN implementation. Both of them brainstormed to complete the FFNN \texttt{forward()} function. Abhirup added additional code to load the test data and calculate the test accuracy. Adem implemented the learning curve plot. They worked together on experimenting with varying hidden\_dim, number of epochs, and learning rates.
+
+  Buvana and Samiha worked on the RNN implementation. Buvana completed the RNN \texttt{forward()} function and added the code for test accuracy calculation, and Samiha developed the parts for computing training loss, validation accuracy, and plotting the learning curves. Together, they experimented with different values of hidden\_dim, number of epochs, and learning rates to determine the optimal values.
+
+  \subsection{Feedback for the Assignment}
+  We feel that this assignment gave us a chance to apply the theory that was presented during the lectures as a hands-on exercise. It cleared our misconceptions and deepened our understanding of neural networks. As such, we feel that the difficulty level of this assignment was appropriate when compared to the material covered in the lectures. We enjoyed working on this assignment and are thankful for our instructor Dr Xinya Du's guidance.
+
+  \end{document}
